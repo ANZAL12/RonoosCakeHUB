@@ -1,5 +1,6 @@
 services:
   - type: web
+    name: ronoos-backend
     plan: free
     rootDir: backend
     runtime: python
