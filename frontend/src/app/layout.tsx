@@ -4,10 +4,23 @@ import "./globals.css";
 import { Providers } from "@/components/Providers";
 import Navbar from "@/components/Navbar";
 
-// ... existing code ...
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
 
-export default function RootLayout({
-  children,
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  title: "Ronoos BakeHub",
+  description: "Artisan bakery and custom cakes",
+};
+
+import { Toaster } from 'react-hot-toast';
+children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {

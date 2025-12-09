@@ -67,12 +67,79 @@ export default function ProductsPage() {
             </div>
         );
     }
+    'use client';
 
-    return (
-        <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50">
-            {/* Unified Navigation handled in Layout */}
+    import { useQuery } from '@tanstack/react-query';
+    import apiClient from '@/lib/api';
+    import toast from 'react-hot-toast';
+    import Link from 'next/link';
+    import { useRouter } from 'next/navigation';
+    import { useCart } from '@/contexts/CartContext';
+    import { useAuth } from '@/contexts/AuthContext';
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    interface Product {
+        id: number;
+        name: string;
+        description: string;
+        category: number;
+        is_customizable: boolean;
+        variants: Array<{
+            id: number;
+            label: string;
+            price: string;
+            is_eggless: boolean;
+        }>;
+        images: Array<{
+            id: number;
+            image?: string;
+            image_url?: string;
+            is_primary: boolean;
+        }>;
+    }
+
+    import Navbar from '@/components/Navbar';
+
+    export default function ProductsPage() {
+        const router = useRouter();
+        const { user } = useAuth();
+        const { addItem } = useCart();
+
+        // ... existing query code ...
+
+        const { data: products, isLoading } = useQuery({
+            queryKey: ['products'],
+            queryFn: async () => {
+                const response = await apiClient.get('/api/catalog/products/');
+                return response.data as Product[];
+            },
+        });
+
+        const handleAddToCart = (product: Product, variant: Product['variants'][0]) => {
+            // ... existing handleAddToCart ...
+            addItem({
+                type: 'product',
+                productId: product.id,
+                variantId: variant.id,
+                productName: product.name,
+                variantLabel: variant.label,
+                quantity: 1,
+                unitPrice: parseFloat(variant.price),
+            });
+            toast.success(`Added ${product.name} to cart`);
+        };
+
+        if (isLoading) {
+            // ... existing loading ...
+            return (
+                <div className="min-h-screen flex items-center justify-center">
+                    <div className="text-xl">Loading products...</div>
+                </div>
+            );
+        }
+
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50">
+                {/* Unified Navigation handled in Layout */}
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                     <h1 className="text-4xl font-bold mb-8 text-gray-900">Our Products</h1>
@@ -133,5 +200,5 @@ export default function ProductsPage() {
                     )}
                 </div>
             </div>
-            );
-}
+        );
+    }
