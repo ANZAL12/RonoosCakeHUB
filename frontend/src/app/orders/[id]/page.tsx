@@ -52,15 +52,14 @@ export default function OrderDetailPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50">
-            <header className="bg-white shadow-sm">
-                <div className="max-w-7xl mx-auto px-4 py-4">
-                    <Link href="/orders" className="text-orange-600 hover:text-orange-700">
+            {/* <Navbar /> handled by Layout */}
+
+            <div className="max-w-4xl mx-auto px-4 py-8">
+                <div className="mb-6">
+                    <Link href="/orders" className="text-orange-600 hover:text-orange-700 font-medium">
                         ← Back to Orders
                     </Link>
                 </div>
-            </header>
-
-            <div className="max-w-4xl mx-auto px-4 py-8">
                 <h1 className="text-4xl font-bold text-gray-900 mb-2">Order #{order.id}</h1>
                 <p className="text-gray-600 mb-8">
                     Placed on {new Date(order.created_at).toLocaleDateString('en-IN', {
