@@ -154,16 +154,7 @@ export default function CustomCakePage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50">
             {/* Header */}
-            <header className="bg-white shadow-sm">
-                <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-                    <Link href="/" className="text-2xl font-bold text-orange-600">
-                        Ronoos BakeHub
-                    </Link>
-                    <Link href="/cart" className="text-gray-700 hover:text-orange-600">
-                        Cart
-                    </Link>
-                </div>
-            </header>
+            {/* Header: Global Navbar */}
 
             <div className="max-w-4xl mx-auto px-4 py-8">
                 <h1 className="text-4xl font-bold text-gray-900 mb-8">Build Your Custom Cake</h1>

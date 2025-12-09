@@ -2,23 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
+import Navbar from "@/components/Navbar";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "Ronoos BakeHub",
-  description: "Artisan bakery and custom cakes",
-};
-
-import { Toaster } from 'react-hot-toast';
+// ... existing code ...
 
 export default function RootLayout({
   children,
@@ -29,6 +15,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Providers>
+          <Navbar />
           <Toaster
             position="top-right"
             toastOptions={{

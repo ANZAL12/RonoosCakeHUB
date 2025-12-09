@@ -32,16 +32,7 @@ export default function OrdersPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50">
-            <header className="bg-white shadow-sm">
-                <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-                    <Link href="/" className="text-2xl font-bold text-orange-600">
-                        Ronoos BakeHub
-                    </Link>
-                    <Link href="/products" className="text-gray-700 hover:text-orange-600">
-                        Browse Products
-                    </Link>
-                </div>
-            </header>
+            {/* Header: Global Navbar */}
 
             <div className="max-w-6xl mx-auto px-4 py-8">
                 <h1 className="text-4xl font-bold text-gray-900 mb-8">My Orders</h1>
