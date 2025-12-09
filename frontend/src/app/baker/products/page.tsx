@@ -20,6 +20,7 @@ export default function BakerProductsPage() {
     const { data: products, isLoading } = useQuery({
         queryKey: ['baker-products'],
         queryFn: async () => {
+            const response = await apiClient.get('/catalog/products/');
             return response.data;
         },
         enabled: !!user && user.role === 'baker',
