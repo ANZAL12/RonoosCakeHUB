@@ -13,3 +13,11 @@ urlpatterns = [
     path('api/orders/', include('orders.urls')),
     path('api/coupons/', include('coupons.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Force media serving on Render (for demo purposes)
+from django.urls import re_path
+from django.views.static import serve
+if not settings.DEBUG:
+    urlpatterns += [
+        re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+    ]
