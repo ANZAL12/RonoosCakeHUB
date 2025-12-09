@@ -16,7 +16,7 @@ services:
       - key: DEBUG
         value: "False"
       - key: CLOUDINARY_CLOUD_NAME
-        value: "backend"
+        value: "dy8s5kclm"
       - key: CLOUDINARY_API_KEY
         value: "885592763692399"
       - key: CLOUDINARY_API_SECRET
