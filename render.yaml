@@ -15,6 +15,12 @@ services:
         value: 4
       - key: DEBUG
         value: "False"
+      - key: CLOUDINARY_CLOUD_NAME
+        value: "backend"
+      - key: CLOUDINARY_API_KEY
+        value: "885592763692399"
+      - key: CLOUDINARY_API_SECRET
+        value: "g1mdpTCjZDq0koX-gx1eKtyASvQ"
       - key: DATABASE_URL
         fromDatabase:
           name: ronoos-db
