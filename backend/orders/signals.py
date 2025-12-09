@@ -34,5 +34,8 @@ def notify_customer_on_status_change(sender, instance, created, **kwargs):
         # OR: Just send the email. If the viewset updates status, it saves.
         # We will assume ViewSet handles status transitions properly.
         
-        from utils.email import send_order_status_email
-        send_order_status_email(instance)
+        try:
+            from utils.email import send_order_status_email
+            send_order_status_email(instance)
+        except Exception as e:
+            print(f"Signal Email Error: {e}")
