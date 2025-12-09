@@ -16,6 +16,7 @@ class BakerProductViewSet(viewsets.ModelViewSet):
     permission_classes = [IsBaker]
     queryset = Product.objects.all().prefetch_related('variants', 'images')
     serializer_class = BakerProductSerializer
+    ordering = ['-id']
     
     @action(detail=True, methods=['post'], url_path='variants')
     def add_variant(self, request, pk=None):

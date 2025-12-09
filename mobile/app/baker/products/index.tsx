@@ -40,7 +40,7 @@ export default function BakerProductsList() {
         >
             <Image
                 source={{ uri: item.image || 'https://via.placeholder.com/100' }}
-                className="w-16 h-16 rounded-lg bg-gray-200"
+                className="w-24 h-24 rounded-lg bg-gray-200"
             />
             <View className="flex-1 ml-3">
                 <Text className="font-bold text-gray-800 text-lg">{item.name}</Text>

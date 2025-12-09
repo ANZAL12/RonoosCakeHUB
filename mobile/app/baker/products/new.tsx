@@ -53,9 +53,8 @@ export default function NewProductScreen() {
         // No permissions request is necessary for launching the image library
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ['images'],
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 0.8,
+            allowsEditing: false,
+            quality: 1,
         });
 
         if (!result.canceled) {
@@ -156,7 +155,7 @@ export default function NewProductScreen() {
                     <Text className="text-gray-700 font-semibold mb-2">Product Image</Text>
                     <TouchableOpacity
                         onPress={pickImage}
-                        className="border-2 border-dashed border-gray-300 rounded-lg h-48 justify-center items-center mb-6 overflow-hidden bg-gray-50"
+                        className="border-2 border-dashed border-gray-300 rounded-lg h-96 justify-center items-center mb-6 overflow-hidden bg-gray-50"
                     >
                         {image ? (
                             <View className="w-full h-full relative">

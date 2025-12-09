@@ -72,11 +72,11 @@ export default function ProductDetailsScreen() {
         <View className="flex-1 bg-white">
             <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
                 {product.images && product.images.length > 0 ? (
-                    <Image source={{ uri: product.images[0].image }} className="w-full h-72" resizeMode="cover" />
+                    <Image source={{ uri: product.images[0].image }} className="w-full h-96" resizeMode="cover" />
                 ) : product.image ? (
-                    <Image source={{ uri: product.image }} className="w-full h-72" resizeMode="cover" />
+                    <Image source={{ uri: product.image }} className="w-full h-96" resizeMode="cover" />
                 ) : (
-                    <View className="w-full h-72 bg-gray-200 items-center justify-center">
+                    <View className="w-full h-96 bg-gray-200 items-center justify-center">
                         <Text className="text-gray-400">No Image</Text>
                     </View>
                 )}
@@ -95,8 +95,8 @@ export default function ProductDetailsScreen() {
                                         key={variant.id}
                                         onPress={() => setSelectedVariant(variant)}
                                         className={`px-4 py-3 rounded-lg border-2 ${selectedVariant?.id === variant.id
-                                                ? 'border-blue-600 bg-blue-50'
-                                                : 'border-gray-300 bg-white'
+                                            ? 'border-blue-600 bg-blue-50'
+                                            : 'border-gray-300 bg-white'
                                             }`}
                                     >
                                         <Text className={`font-semibold ${selectedVariant?.id === variant.id ? 'text-blue-600' : 'text-gray-700'

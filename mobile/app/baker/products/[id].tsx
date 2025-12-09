@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert, ActivityIndicator, Image, RefreshControl } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { api } from '../../../lib/api';
@@ -48,12 +48,19 @@ export default function ProductDetailsScreen() {
         }
     }, [id, router]);
 
+    const [refreshing, setRefreshing] = useState(false);
+
+    const onRefresh = React.useCallback(async () => {
+        setRefreshing(true);
+        await fetchProduct();
+        setRefreshing(false);
+    }, [fetchProduct]);
+
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ['images'],
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 0.8,
+            allowsEditing: false,
+            quality: 1,
         });
 
         if (!result.canceled) {
@@ -141,13 +148,7 @@ export default function ProductDetailsScreen() {
         );
     }
 
-    const [refreshing, setRefreshing] = useState(false);
 
-    const onRefresh = React.useCallback(async () => {
-        setRefreshing(true);
-        await fetchProduct();
-        setRefreshing(false);
-    }, [fetchProduct]);
 
     return (
         <ScrollView
@@ -218,7 +219,7 @@ export default function ProductDetailsScreen() {
                     <Text className="text-gray-700 font-semibold mb-2">Product Image</Text>
                     <TouchableOpacity
                         onPress={pickImage}
-                        className="border-2 border-dashed border-gray-300 rounded-lg h-48 justify-center items-center mb-6 overflow-hidden bg-gray-50"
+                        className="border-2 border-dashed border-gray-300 rounded-lg h-96 justify-center items-center mb-6 overflow-hidden bg-gray-50"
                     >
                         {formData.image ? (
                             <View className="w-full h-full relative">

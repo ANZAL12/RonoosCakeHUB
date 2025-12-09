@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { api } from '../lib/api';
 
 interface Product {
@@ -28,12 +28,12 @@ const ProductItem = React.memo(({ item, onPress, isBaker }: { item: Product; onP
             {imageUri ? (
                 <Image
                     source={{ uri: imageUri }}
-                    className="w-full h-48"
+                    className="w-full h-72"
                     resizeMode="cover"
                     fadeDuration={0}
                 />
             ) : (
-                <View className="w-full h-48 bg-gray-200 items-center justify-center">
+                <View className="w-full h-72 bg-gray-200 items-center justify-center">
                     <Text className="text-gray-400">No Image</Text>
                 </View>
             )}
@@ -52,9 +52,11 @@ export default function ProductList({ isBaker = false }: { isBaker?: boolean }) 
     const [products, setProducts] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        fetchProducts();
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            fetchProducts();
+        }, [])
+    );
 
     const fetchProducts = async () => {
         try {
