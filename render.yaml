@@ -16,6 +16,7 @@ services:
       - key: DJANGO_ALLOWED_HOSTS
         fromService:
           type: web
+          name: ronoos-backend
           envVar: RENDER_EXTERNAL_HOSTNAME
       - key: DATABASE_URL
         fromDatabase:
