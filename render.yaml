@@ -1,6 +1,7 @@
 services:
   - type: web
     name: ronoos-backend
+    plan: free
     runtime: python
     buildCommand: "./build.sh"
     startCommand: "gunicorn ronoos_backend.wsgi:application"
@@ -20,5 +21,6 @@ services:
 
 databases:
   - name: ronoos-db
+    plan: free
     databaseName: ronoos_db
     user: ronoos_user
