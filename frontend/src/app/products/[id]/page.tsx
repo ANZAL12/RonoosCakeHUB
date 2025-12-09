@@ -86,14 +86,20 @@ export default function ProductDetailsPage() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* <Navbar /> handled by Layout */}
+            <nav className="bg-white shadow-sm border-b border-orange-100">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex justify-between h-16 items-center">
+                        <Link href="/" className="text-2xl font-bold text-orange-600">
+                            Ronoos BakeHub
+                        </Link>
+                        <Link href="/products" className="text-gray-700 hover:text-orange-600">
+                            ← Back to Products
+                        </Link>
+                    </div>
+                </div>
+            </nav>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="mb-6">
-                    <Link href="/products" className="text-orange-600 hover:text-orange-700 font-medium">
-                        ← Back to Products
-                    </Link>
-                </div>
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                     <div className="grid md:grid-cols-2 gap-8">
                         {/* Image Section */}

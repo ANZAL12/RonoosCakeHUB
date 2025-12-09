@@ -32,7 +32,7 @@ export default function OrdersPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50">
-            {/* Header: Global Navbar */}
+            {/* <Navbar /> handled by Layout */}
 
             <div className="max-w-6xl mx-auto px-4 py-8">
                 <h1 className="text-4xl font-bold text-gray-900 mb-8">My Orders</h1>

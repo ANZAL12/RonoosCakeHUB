@@ -64,7 +64,7 @@ export default function ProductsPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50">
-            {/* Unified Navigation handled in Layout */}
+            {/* Navbar is handled by the RootLayout in src/app/layout.tsx */}
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <h1 className="text-4xl font-bold mb-8 text-gray-900">Our Products</h1>

@@ -29,9 +29,6 @@ export default function Navbar() {
                                 </Link>
                             ) : (
                                 <>
-                                    <Link href="/profile" className="text-gray-700 hover:text-orange-600 font-medium">
-                                        Profile
-                                    </Link>
                                     <Link href="/orders" className="text-gray-700 hover:text-orange-600 font-medium">
                                         My Orders
                                     </Link>
@@ -40,6 +37,23 @@ export default function Navbar() {
                                         {totalItems > 0 && (
                                             <span className="absolute -top-2 -right-2 bg-orange-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                                                 {totalItems}
+                                            </span>
+                                        )}
+                                    </Link>
+                                    <Link
+                                        href="/profile"
+                                        className="w-9 h-9 rounded-full bg-orange-100 flex items-center justify-center hover:bg-orange-200 transition overflow-hidden border border-orange-200"
+                                        title={user.name}
+                                    >
+                                        {user.profile_picture ? (
+                                            <img
+                                                src={user.profile_picture}
+                                                alt={user.name}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <span className="text-orange-600 font-semibold text-sm">
+                                                {user.name.charAt(0).toUpperCase()}
                                             </span>
                                         )}
                                     </Link>

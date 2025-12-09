@@ -154,7 +154,7 @@ export default function CustomCakePage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50">
             {/* Header */}
-            {/* Header: Global Navbar */}
+            {/* <Navbar /> handled by Layout */}
 
             <div className="max-w-4xl mx-auto px-4 py-8">
                 <h1 className="text-4xl font-bold text-gray-900 mb-8">Build Your Custom Cake</h1>
