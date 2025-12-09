@@ -214,17 +214,29 @@ export default function OrderDetailsScreen() {
                             {order.status.toUpperCase()}
                         </Text>
 
-                        {nextStatus && (
-                            <TouchableOpacity
-                                className={`px-4 py-2 rounded-lg ${updating ? 'bg-gray-300' : 'bg-orange-600'}`}
-                                onPress={() => updateStatus(nextStatus)}
-                                disabled={updating}
-                            >
-                                <Text className="text-white font-semibold">
-                                    Mark as {nextStatus.replace('_', ' ').toUpperCase()}
-                                </Text>
-                            </TouchableOpacity>
-                        )}
+                        <View className="flex-row gap-2">
+                            {order.status === 'pending' && (
+                                <TouchableOpacity
+                                    className={`px-4 py-2 rounded-lg bg-red-600 ${updating ? 'opacity-50' : ''}`}
+                                    onPress={() => updateStatus('cancelled')}
+                                    disabled={updating}
+                                >
+                                    <Text className="text-white font-semibold">Reject</Text>
+                                </TouchableOpacity>
+                            )}
+
+                            {nextStatus && (
+                                <TouchableOpacity
+                                    className={`px-4 py-2 rounded-lg ${updating ? 'bg-gray-300' : 'bg-orange-600'}`}
+                                    onPress={() => updateStatus(nextStatus)}
+                                    disabled={updating}
+                                >
+                                    <Text className="text-white font-semibold">
+                                        Mark as {nextStatus.replace('_', ' ').toUpperCase()}
+                                    </Text>
+                                </TouchableOpacity>
+                            )}
+                        </View>
                     </View>
 
                     {/* Delivery Date & Time Details */}

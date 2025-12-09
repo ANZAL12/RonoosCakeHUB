@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Platform } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
 
 // Use 10.0.2.2 for Android Emulator, localhost for iOS Simulator
 // For physical device, use your machine's LAN IP
@@ -16,4 +17,19 @@ export const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
+});
+
+// Add interceptor to attach token
+api.interceptors.request.use(async (config) => {
+    try {
+        const token = await SecureStore.getItemAsync('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+    } catch (error) {
+        console.error('Error attaching token:', error);
+    }
+    return config;
+}, (error) => {
+    return Promise.reject(error);
 });

@@ -3,6 +3,7 @@ import { Stack, useRouter, useSegments } from "expo-router";
 import { useEffect } from "react";
 import { useAuthStore } from "../store/authStore";
 
+
 export default function Layout() {
     const { user, isLoading, checkAuth } = useAuthStore();
     const segments = useSegments();

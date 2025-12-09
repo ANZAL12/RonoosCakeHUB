@@ -28,6 +28,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     place = models.CharField(max_length=255, blank=True)
     profile_picture = models.ImageField(upload_to='profiles/', blank=True, null=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='customer')
+    expo_push_token = models.CharField(max_length=255, blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
