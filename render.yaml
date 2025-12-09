@@ -1,7 +1,7 @@
 services:
   - type: web
-    name: ronoos-backend
     plan: free
+    rootDir: backend
     runtime: python
     buildCommand: "./build.sh"
     startCommand: "gunicorn ronoos_backend.wsgi:application"
