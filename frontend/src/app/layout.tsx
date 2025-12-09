@@ -20,7 +20,8 @@ export const metadata: Metadata = {
 };
 
 import { Toaster } from 'react-hot-toast';
-children,
+export default function RootLayout({
+  children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
