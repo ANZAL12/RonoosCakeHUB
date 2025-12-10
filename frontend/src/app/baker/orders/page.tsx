@@ -94,13 +94,7 @@ export default function BakerOrdersPage() {
 
     return (
         <div className="min-h-screen bg-gray-100">
-            <header className="bg-white shadow">
-                <div className="max-w-7xl mx-auto px-4 py-4">
-                    <Link href="/baker/dashboard" className="text-orange-600 hover:text-orange-700">
-                        ← Back to Dashboard
-                    </Link>
-                </div>
-            </header>
+
 
             <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="flex justify-between items-center mb-6">

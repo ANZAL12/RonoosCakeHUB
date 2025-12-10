@@ -51,30 +51,7 @@ export default function BakerDashboard() {
 
     return (
         <div className="min-h-screen bg-gray-100">
-            <header className="bg-white shadow">
-                <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-                    <Link href="/baker/dashboard" className="text-2xl font-bold text-orange-600">
-                        Baker Dashboard
-                    </Link>
-                    <div className="flex gap-4 items-center">
-                        <Link href="/baker/products" className="text-gray-700 hover:text-orange-600">
-                            Products
-                        </Link>
-                        <Link href="/baker/orders" className="text-gray-700 hover:text-orange-600">
-                            Orders
-                        </Link>
-                        <Link href="/baker/analytics" className="text-gray-700 hover:text-orange-600">
-                            Analytics
-                        </Link>
-                        <button
-                            onClick={logout}
-                            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-                        >
-                            Logout
-                        </button>
-                    </div>
-                </div>
-            </header>
+
 
             <div className="max-w-7xl mx-auto px-4 py-8">
                 <h2 className="text-3xl font-bold text-gray-900 mb-8">Overview</h2>

@@ -35,20 +35,7 @@ export default function BakerProductsPage() {
 
     return (
         <div className="min-h-screen bg-gray-100">
-            <header className="bg-white shadow">
-                <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-                    <Link href="/baker/dashboard" className="text-orange-600 hover:text-orange-700">
-                        ← Back to Dashboard
-                    </Link>
-                    <h1 className="text-2xl font-bold text-gray-900">Product Management</h1>
-                    <Link
-                        href="/baker/products/new"
-                        className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
-                    >
-                        Add Product
-                    </Link>
-                </div>
-            </header>
+
 
             <div className="max-w-7xl mx-auto px-4 py-8">
                 {isLoading ? (
