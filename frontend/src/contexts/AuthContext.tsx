@@ -11,6 +11,7 @@ interface User {
     role: string;
     profile_picture?: string | null;
     phone?: string;
+    is_custom_build_enabled?: boolean;
 }
 
 interface AuthContextType {

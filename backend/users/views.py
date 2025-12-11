@@ -56,3 +56,11 @@ class AddressViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+class BakerSettingsView(generics.RetrieveAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_object(self):
+        # Return the first baker found
+        return User.objects.filter(role='baker').first()

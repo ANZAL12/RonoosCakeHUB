@@ -143,8 +143,36 @@ export default function BakerDashboard() {
                 </View>
             </View>
 
-            {/* Quick Actions */}
+            {/* Store Settings */}
             <View className="px-4 mb-6">
+                <Text className="text-lg font-bold text-gray-800 mb-3">Store Settings</Text>
+                <View className="bg-white p-4 rounded-xl shadow-sm flex-row justify-between items-center">
+                    <View>
+                        <Text className="font-bold text-gray-800">Custom Cake Builder</Text>
+                        <Text className="text-xs text-gray-500">Allow customers to build custom cakes</Text>
+                    </View>
+                    <TouchableOpacity
+                        onPress={async () => {
+                            const newValue = !(user?.is_custom_build_enabled ?? true);
+                            try {
+                                await api.patch('/users/me/', { is_custom_build_enabled: newValue });
+                                alert('Setting updated!');
+                                // Ideally we should refresh the user state here, assuming useAuthStore has a way to update or refetch
+                                // For now we just alert.
+                            } catch (error) {
+                                console.error('Failed to update setting', error);
+                                alert('Failed to update setting');
+                            }
+                        }}
+                        className={`w-12 h-7 rounded-full flex-row items-center px-1 ${user?.is_custom_build_enabled ?? true ? 'bg-orange-600 justify-end' : 'bg-gray-300 justify-start'}`}
+                    >
+                        <View className="w-5 h-5 bg-white rounded-full shadow-sm" />
+                    </TouchableOpacity>
+                </View>
+            </View>
+
+            {/* Quick Actions */}
+            < View className="px-4 mb-6" >
                 <Text className="text-lg font-bold text-gray-800 mb-3">Quick Actions</Text>
                 <View className="flex-row flex-wrap justify-between">
                     {quickActions.map((action, index) => (
@@ -158,10 +186,10 @@ export default function BakerDashboard() {
                         </TouchableOpacity>
                     ))}
                 </View>
-            </View>
+            </View >
 
             {/* Manage Cake Options (Compact) */}
-            <View className="px-4 mb-6">
+            < View className="px-4 mb-6" >
                 <Text className="text-lg font-bold text-gray-800 mb-3">Manage Custom Options</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     {cakeOptionActions.map((action, index) => (
@@ -174,36 +202,38 @@ export default function BakerDashboard() {
                         </TouchableOpacity>
                     ))}
                 </ScrollView>
-            </View>
+            </View >
 
             {/* Recent Orders */}
-            <View className="px-4 mb-8">
+            < View className="px-4 mb-8" >
                 <Text className="text-lg font-bold text-gray-800 mb-3">Recent Orders</Text>
-                {recentOrders.length === 0 ? (
-                    <Text className="text-gray-500 text-center py-4">No orders yet</Text>
-                ) : (
-                    recentOrders.map((order) => (
-                        <TouchableOpacity
-                            key={order.id}
-                            className="bg-white p-4 rounded-xl mb-3 shadow-sm flex-row justify-between items-center"
-                            onPress={() => router.push(`/baker/orders/${order.id}`)}
-                        >
-                            <View>
-                                <Text className="font-semibold text-gray-800">Order #{order.id}</Text>
-                                <Text className={`text-xs ${order.status === 'pending' ? 'text-blue-600' :
-                                    order.status === 'completed' ? 'text-green-600' : 'text-gray-500'
-                                    }`}>
-                                    {order.status.toUpperCase()}
-                                </Text>
-                            </View>
-                            <Text className="font-bold text-orange-600">₹{order.final_amount}</Text>
-                        </TouchableOpacity>
-                    ))
-                )}
-            </View>
+                {
+                    recentOrders.length === 0 ? (
+                        <Text className="text-gray-500 text-center py-4">No orders yet</Text>
+                    ) : (
+                        recentOrders.map((order) => (
+                            <TouchableOpacity
+                                key={order.id}
+                                className="bg-white p-4 rounded-xl mb-3 shadow-sm flex-row justify-between items-center"
+                                onPress={() => router.push(`/baker/orders/${order.id}`)}
+                            >
+                                <View>
+                                    <Text className="font-semibold text-gray-800">Order #{order.id}</Text>
+                                    <Text className={`text-xs ${order.status === 'pending' ? 'text-blue-600' :
+                                        order.status === 'completed' ? 'text-green-600' : 'text-gray-500'
+                                        }`}>
+                                        {order.status.toUpperCase()}
+                                    </Text>
+                                </View>
+                                <Text className="font-bold text-orange-600">₹{order.final_amount}</Text>
+                            </TouchableOpacity>
+                        ))
+                    )
+                }
+            </View >
 
 
 
-        </ScrollView>
+        </ScrollView >
     );
 }

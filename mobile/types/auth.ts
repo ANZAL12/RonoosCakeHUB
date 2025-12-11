@@ -5,6 +5,7 @@ export interface User {
     name?: string;
     phone?: string;
     profile_picture?: string | null;
+    is_custom_build_enabled?: boolean;
     role: 'customer' | 'baker' | 'admin';
 }
 

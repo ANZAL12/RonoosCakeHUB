@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
+import { useState, useEffect } from 'react';
+import apiClient from '@/lib/api';
 
 export default function Navbar() {
     const { user, logout } = useAuth();
@@ -15,6 +17,19 @@ export default function Navbar() {
         const activeClass = "text-orange-600 font-bold pointer-events-none cursor-default";
         return pathname === path ? activeClass : baseClass;
     };
+
+    const [isCustomCakeEnabled, setIsCustomCakeEnabled] = useState(true);
+
+    useEffect(() => {
+        // Fetch baker settings to know if custom cake is enabled
+        apiClient.get('/api/users/baker-settings/')
+            .then(res => {
+                if (res.data.is_custom_build_enabled !== undefined) {
+                    setIsCustomCakeEnabled(res.data.is_custom_build_enabled);
+                }
+            })
+            .catch(err => console.error('Failed to fetch baker settings', err));
+    }, []);
 
     return (
         <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -67,9 +82,11 @@ export default function Navbar() {
                             <Link href="/products" className={getLinkClass("/products")} aria-disabled={pathname === "/products"}>
                                 Products
                             </Link>
-                            <Link href="/custom-cake" className={getLinkClass("/custom-cake")} aria-disabled={pathname === "/custom-cake"}>
-                                Custom Cake
-                            </Link>
+                            {isCustomCakeEnabled && (
+                                <Link href="/custom-cake" className={getLinkClass("/custom-cake")} aria-disabled={pathname === "/custom-cake"}>
+                                    Custom Cake
+                                </Link>
+                            )}
                             {user ? (
                                 <>
                                     <Link href="/orders" className={getLinkClass("/orders")} aria-disabled={pathname === "/orders"}>
