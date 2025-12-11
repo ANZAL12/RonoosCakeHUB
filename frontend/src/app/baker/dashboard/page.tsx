@@ -5,11 +5,20 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import apiClient from '@/lib/api';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function BakerDashboard() {
-    const { user, logout } = useAuth();
+    const { user, logout, refreshUser } = useAuth();
     const router = useRouter();
+
+    // Local state for optimistic UI updates
+    const [isToggleEnabled, setIsToggleEnabled] = useState(false);
+
+    useEffect(() => {
+        if (user) {
+            setIsToggleEnabled(user.is_custom_build_enabled ?? true);
+        }
+    }, [user]);
 
     useEffect(() => {
         if (user && user.role !== 'baker') {
@@ -107,15 +116,21 @@ export default function BakerDashboard() {
                                 <input
                                     type="checkbox"
                                     className="sr-only peer"
-                                    checked={user?.is_custom_build_enabled ?? true}
+                                    checked={isToggleEnabled}
                                     onChange={async (e) => {
                                         const newValue = e.target.checked;
+                                        // Optimistic update
+                                        setIsToggleEnabled(newValue);
+
                                         try {
                                             await apiClient.patch('/api/users/me/', { is_custom_build_enabled: newValue });
-                                            // Force reload to update context (could be better handling)
-                                            window.location.reload();
+                                            // Silently refresh context
+                                            await refreshUser();
+                                            // toast.success('Settings updated'); // Optional: add toast if desired
                                         } catch (error) {
                                             console.error('Failed to update setting', error);
+                                            // Revert on failure
+                                            setIsToggleEnabled(!newValue);
                                             alert('Failed to update setting');
                                         }
                                     }}

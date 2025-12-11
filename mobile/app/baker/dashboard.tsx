@@ -20,6 +20,16 @@ export default function BakerDashboard() {
     });
     const [recentOrders, setRecentOrders] = useState<any[]>([]);
 
+    // Local state for optimistic UI updates
+    const [isToggleEnabled, setIsToggleEnabled] = useState(false);
+
+    // Initialize toggle state from user prop
+    React.useEffect(() => {
+        if (user) {
+            setIsToggleEnabled(user.is_custom_build_enabled ?? true);
+        }
+    }, [user]);
+
     const fetchData = async () => {
         try {
             const [ordersRes, productsRes] = await Promise.all([
@@ -153,18 +163,22 @@ export default function BakerDashboard() {
                     </View>
                     <TouchableOpacity
                         onPress={async () => {
-                            const newValue = !(user?.is_custom_build_enabled ?? true);
+                            const newValue = !isToggleEnabled;
+                            // Optimistic update
+                            setIsToggleEnabled(newValue);
+
                             try {
                                 await api.patch('/users/me/', { is_custom_build_enabled: newValue });
-                                alert('Setting updated!');
-                                // Ideally we should refresh the user state here, assuming useAuthStore has a way to update or refetch
-                                // For now we just alert.
+                                // Silently sync logic if possible, or just trust the optimistic update for now.
+                                // In a real app we might refetch user profile here.
                             } catch (error) {
                                 console.error('Failed to update setting', error);
+                                // Revert on failure
+                                setIsToggleEnabled(!newValue);
                                 alert('Failed to update setting');
                             }
                         }}
-                        className={`w-12 h-7 rounded-full flex-row items-center px-1 ${user?.is_custom_build_enabled ?? true ? 'bg-orange-600 justify-end' : 'bg-gray-300 justify-start'}`}
+                        className={`w-12 h-7 rounded-full flex-row items-center px-1 ${isToggleEnabled ? 'bg-orange-600 justify-end' : 'bg-gray-300 justify-start'}`}
                     >
                         <View className="w-5 h-5 bg-white rounded-full shadow-sm" />
                     </TouchableOpacity>

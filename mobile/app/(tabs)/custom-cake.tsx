@@ -41,21 +41,8 @@ export default function CustomCakeScreen() {
     const [isCustomCakeEnabled, setIsCustomCakeEnabled] = useState(false); // Default to false for safety
 
     useEffect(() => {
-        const loadData = async () => {
+        const fetchInitialData = async () => {
             try {
-                // Fetch settings
-                console.log('Fetching baker settings...');
-                const settingsRes = await api.get('/users/baker-settings/');
-                console.log('Baker settings response:', settingsRes.data);
-
-                if (settingsRes.data && settingsRes.data.is_custom_build_enabled !== undefined) {
-                    setIsCustomCakeEnabled(settingsRes.data.is_custom_build_enabled);
-                    console.log('Set isCustomCakeEnabled to:', settingsRes.data.is_custom_build_enabled);
-                } else {
-                    console.log('is_custom_build_enabled missing in response, defaulting to false');
-                    setIsCustomCakeEnabled(false);
-                }
-
                 // Fetch options
                 const [baseRes, flavourRes, shapeRes, weightRes] = await Promise.all([
                     api.get('/catalog/cake-bases/'),
@@ -71,15 +58,32 @@ export default function CustomCakeScreen() {
                     weight: weightRes.data,
                 });
 
+                setIsLoading(false);
             } catch (error) {
-                console.error('Error loading data:', error);
-                // Alert.alert('Error', 'Failed to load data'); 
-            } finally {
+                console.error('Error loading options:', error);
                 setIsLoading(false);
             }
         };
 
-        loadData();
+        const checkSettings = async () => {
+            try {
+                const settingsRes = await api.get('/users/baker-settings/');
+                if (settingsRes.data && settingsRes.data.is_custom_build_enabled !== undefined) {
+                    setIsCustomCakeEnabled(settingsRes.data.is_custom_build_enabled);
+                }
+            } catch (error) {
+                console.error('Error checking settings:', error);
+            }
+        };
+
+        // Initial load
+        fetchInitialData();
+        checkSettings();
+
+        // Poll settings every 3 seconds
+        const interval = setInterval(checkSettings, 3000);
+
+        return () => clearInterval(interval);
     }, []);
 
     if (isLoading) {

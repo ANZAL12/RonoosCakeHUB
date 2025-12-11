@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import apiClient from '@/lib/api';
 import toast from 'react-hot-toast';
@@ -11,20 +12,17 @@ export default function CustomCakePage() {
     const router = useRouter();
     const { addItem } = useCart();
 
-    // Feature Toggle State
-    const [isCustomCakeEnabled, setIsCustomCakeEnabled] = useState(true);
-    const [isLoadingSettings, setIsLoadingSettings] = useState(true);
+    // Feature Toggle State - Real-time polling
+    const { data: settings, isLoading: isLoadingSettings } = useQuery({
+        queryKey: ['baker-settings'],
+        queryFn: async () => {
+            const res = await apiClient.get('/api/users/baker-settings/');
+            return res.data;
+        },
+        refetchInterval: 3000, // Poll every 3 seconds
+    });
 
-    useEffect(() => {
-        apiClient.get('/api/users/baker-settings/')
-            .then(res => {
-                if (res.data.is_custom_build_enabled !== undefined) {
-                    setIsCustomCakeEnabled(res.data.is_custom_build_enabled);
-                }
-            })
-            .catch(err => console.error('Failed to fetch baker settings', err))
-            .finally(() => setIsLoadingSettings(false));
-    }, []);
+    const isCustomCakeEnabled = settings?.is_custom_build_enabled ?? true;
 
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(true);
@@ -79,6 +77,24 @@ export default function CustomCakePage() {
         fetchOptions();
     }, []);
 
+    const calculatePrice = () => {
+        let total = 500; // Base price
+
+        // Helper to get price safely
+        const getPrice = (category: keyof typeof options, id: number | null) => {
+            if (!id) return 0;
+            const opt = options[category].find((o: any) => o.id === id);
+            return opt ? parseFloat(opt.price) : 0;
+        };
+
+        total += getPrice('base', selections.base);
+        total += getPrice('flavour', selections.flavour);
+        total += getPrice('shape', selections.shape);
+        total += getPrice('weight', selections.weight);
+
+        setCalculatedPrice(total);
+    };
+
     useEffect(() => {
         calculatePrice();
     }, [selections, options]);
@@ -121,23 +137,7 @@ export default function CustomCakePage() {
         }));
     };
 
-    const calculatePrice = () => {
-        let total = 500; // Base price
 
-        // Helper to get price safely
-        const getPrice = (category: keyof typeof options, id: number | null) => {
-            if (!id) return 0;
-            const opt = options[category].find((o: any) => o.id === id);
-            return opt ? parseFloat(opt.price) : 0;
-        };
-
-        total += getPrice('base', selections.base);
-        total += getPrice('flavour', selections.flavour);
-        total += getPrice('shape', selections.shape);
-        total += getPrice('weight', selections.weight);
-
-        setCalculatedPrice(total);
-    };
 
     const handleAddToCart = () => {
         // Validation
