@@ -30,34 +30,87 @@ export default function CustomCakeScreen() {
         shape: [],
         weight: [],
     });
+    const [selections, setSelections] = useState<{
+        base: number | null;
+        flavour: number | null;
+        shape: number | null;
+        weight: number | null;
+    }>({ base: null, flavour: null, shape: null, weight: null });
+
     const [isLoading, setIsLoading] = useState(true);
+    const [isCustomCakeEnabled, setIsCustomCakeEnabled] = useState(false); // Default to false for safety
 
     useEffect(() => {
-        fetchOptions();
+        const loadData = async () => {
+            try {
+                // Fetch settings
+                console.log('Fetching baker settings...');
+                const settingsRes = await api.get('/users/baker-settings/');
+                console.log('Baker settings response:', settingsRes.data);
+
+                if (settingsRes.data && settingsRes.data.is_custom_build_enabled !== undefined) {
+                    setIsCustomCakeEnabled(settingsRes.data.is_custom_build_enabled);
+                    console.log('Set isCustomCakeEnabled to:', settingsRes.data.is_custom_build_enabled);
+                } else {
+                    console.log('is_custom_build_enabled missing in response, defaulting to false');
+                    setIsCustomCakeEnabled(false);
+                }
+
+                // Fetch options
+                const [baseRes, flavourRes, shapeRes, weightRes] = await Promise.all([
+                    api.get('/catalog/cake-bases/'),
+                    api.get('/catalog/cake-flavours/'),
+                    api.get('/catalog/cake-shapes/'),
+                    api.get('/catalog/cake-weights/'),
+                ]);
+
+                setOptions({
+                    base: baseRes.data,
+                    flavour: flavourRes.data,
+                    shape: shapeRes.data,
+                    weight: weightRes.data,
+                });
+
+            } catch (error) {
+                console.error('Error loading data:', error);
+                // Alert.alert('Error', 'Failed to load data'); 
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadData();
     }, []);
 
-    const fetchOptions = async () => {
-        try {
-            const [baseRes, flavourRes, shapeRes, weightRes] = await Promise.all([
-                api.get('/catalog/cake-bases/'),
-                api.get('/catalog/cake-flavours/'),
-                api.get('/catalog/cake-shapes/'),
-                api.get('/catalog/cake-weights/'),
-            ]);
+    if (isLoading) {
+        return (
+            <View className="flex-1 justify-center items-center bg-gray-50">
+                <ActivityIndicator size="large" color="#ea580c" />
+            </View>
+        );
+    }
 
-            setOptions({
-                base: baseRes.data,
-                flavour: flavourRes.data,
-                shape: shapeRes.data,
-                weight: weightRes.data,
-            });
-        } catch (error) {
-            console.error('Error fetching cake options:', error);
-            Alert.alert('Error', 'Failed to load cake options. Please try again.');
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    if (!isCustomCakeEnabled) {
+        return (
+            <View className="flex-1 justify-center items-center bg-gray-50 p-6">
+                <View className="bg-white p-8 rounded-2xl w-full items-center shadow-sm">
+                    <View className="w-20 h-20 bg-orange-100 rounded-full items-center justify-center mb-6">
+                        <Text className="text-4xl">🎂</Text>
+                    </View>
+                    <Text className="text-2xl font-bold text-gray-900 mb-2 text-center">Coming Soon!</Text>
+                    <Text className="text-gray-500 text-center mb-8">
+                        Our custom cake builder is getting ready. Check back soon!
+                    </Text>
+                    <TouchableOpacity
+                        onPress={() => router.push('/')}
+                        className="bg-orange-600 px-6 py-3 rounded-xl w-full"
+                    >
+                        <Text className="text-white font-bold text-center">Browse Products</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        );
+    }
 
     const toggleOption = (optionId: number) => {
         setSelectedOptions((prev) => {
@@ -80,12 +133,6 @@ export default function CustomCakeScreen() {
 
     // REFACTORED SELECTION LOGIC
     // We'll store selectedOption as an object { base: id, flavour: id, ... }
-    const [selections, setSelections] = useState<{
-        base: number | null;
-        flavour: number | null;
-        shape: number | null;
-        weight: number | null;
-    }>({ base: null, flavour: null, shape: null, weight: null });
 
     const selectOption = (category: keyof OptionsState, id: number) => {
         setSelections(prev => ({ ...prev, [category]: id }));

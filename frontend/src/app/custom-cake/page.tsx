@@ -2,13 +2,30 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { useCart } from '@/contexts/CartContext';
 import apiClient from '@/lib/api';
+import toast from 'react-hot-toast';
+import { useCart } from '@/contexts/CartContext';
+
 
 export default function CustomCakePage() {
     const router = useRouter();
     const { addItem } = useCart();
+
+    // Feature Toggle State
+    const [isCustomCakeEnabled, setIsCustomCakeEnabled] = useState(true);
+    const [isLoadingSettings, setIsLoadingSettings] = useState(true);
+
+    useEffect(() => {
+        apiClient.get('/api/users/baker-settings/')
+            .then(res => {
+                if (res.data.is_custom_build_enabled !== undefined) {
+                    setIsCustomCakeEnabled(res.data.is_custom_build_enabled);
+                }
+            })
+            .catch(err => console.error('Failed to fetch baker settings', err))
+            .finally(() => setIsLoadingSettings(false));
+    }, []);
+
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(true);
 
@@ -65,6 +82,37 @@ export default function CustomCakePage() {
     useEffect(() => {
         calculatePrice();
     }, [selections, options]);
+
+    if (isLoadingSettings) {
+        return (
+            <div className="min-h-screen bg-white flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+            </div>
+        );
+    }
+
+    if (!isCustomCakeEnabled) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+                <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden text-center p-8">
+                    <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <span className="text-4xl text-orange-600">🎂</span>
+                    </div>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-2">Coming Soon!</h2>
+                    <p className="text-gray-600 mb-8">
+                        Our custom cake builder is currently being baked to perfection.
+                        Please check back later or explore our delicious ready-made cakes.
+                    </p>
+                    <button
+                        onClick={() => router.push('/products')}
+                        className="inline-block w-full px-6 py-3 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition duration-200"
+                    >
+                        Browse Products
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     const selectOption = (category: keyof typeof selections, id: number) => {
         setSelections(prev => ({

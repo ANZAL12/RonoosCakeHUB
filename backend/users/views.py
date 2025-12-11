@@ -62,5 +62,5 @@ class BakerSettingsView(generics.RetrieveAPIView):
     permission_classes = [permissions.AllowAny]
 
     def get_object(self):
-        # Return the first baker found
-        return User.objects.filter(role='baker').first()
+        # Return the most recently joined baker (assuming the active user is the latest one during testing)
+        return User.objects.filter(role='baker').order_by('-date_joined').first()

@@ -18,19 +18,6 @@ export default function Navbar() {
         return pathname === path ? activeClass : baseClass;
     };
 
-    const [isCustomCakeEnabled, setIsCustomCakeEnabled] = useState(true);
-
-    useEffect(() => {
-        // Fetch baker settings to know if custom cake is enabled
-        apiClient.get('/api/users/baker-settings/')
-            .then(res => {
-                if (res.data.is_custom_build_enabled !== undefined) {
-                    setIsCustomCakeEnabled(res.data.is_custom_build_enabled);
-                }
-            })
-            .catch(err => console.error('Failed to fetch baker settings', err));
-    }, []);
-
     return (
         <header className="bg-white shadow-sm sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
@@ -82,11 +69,9 @@ export default function Navbar() {
                             <Link href="/products" className={getLinkClass("/products")} aria-disabled={pathname === "/products"}>
                                 Products
                             </Link>
-                            {isCustomCakeEnabled && (
-                                <Link href="/custom-cake" className={getLinkClass("/custom-cake")} aria-disabled={pathname === "/custom-cake"}>
-                                    Custom Cake
-                                </Link>
-                            )}
+                            <Link href="/custom-cake" className={getLinkClass("/custom-cake")} aria-disabled={pathname === "/custom-cake"}>
+                                Custom Cake
+                            </Link>
                             {user ? (
                                 <>
                                     <Link href="/orders" className={getLinkClass("/orders")} aria-disabled={pathname === "/orders"}>
