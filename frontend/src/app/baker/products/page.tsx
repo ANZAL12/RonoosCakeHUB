@@ -20,7 +20,7 @@ export default function BakerProductsPage() {
     const { data: products, isLoading } = useQuery({
         queryKey: ['baker-products'],
         queryFn: async () => {
-            const response = await apiClient.get('/catalog/products/');
+            const response = await apiClient.get('/api/catalog/baker/products/');
             return response.data;
         },
         enabled: !!user && user.role === 'baker',
@@ -81,7 +81,7 @@ export default function BakerProductsPage() {
                                                 {product.variants?.length || 0} variant(s)
                                             </span>
                                             <span>
-                                                {product.category?.name || 'No category'}
+                                                {product.category_name || 'No category'}
                                             </span>
                                         </div>
                                         <Link

@@ -63,7 +63,11 @@ export default function AddProductPage() {
                 formData.append('image', data.image[0]);
                 formData.append('is_primary', 'true');
 
-                await apiClient.post(`/api/catalog/baker/products/${productId}/images/`, formData);
+                await apiClient.post(`/api/catalog/baker/products/${productId}/images/`, formData, {
+                    headers: {
+                        'Content-Type': undefined,
+                    } as any,
+                });
             }
 
             return productId;

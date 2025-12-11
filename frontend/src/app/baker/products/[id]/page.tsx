@@ -121,7 +121,11 @@ export default function EditProductPage() {
     // Image mutations
     const uploadImageMutation = useMutation({
         mutationFn: async (formData: FormData) => {
-            const response = await apiClient.post(`/api/catalog/baker/images/`, formData);
+            const response = await apiClient.post(`/api/catalog/baker/images/`, formData, {
+                headers: {
+                    'Content-Type': undefined,
+                },
+            } as any);
             return response.data;
         },
         onSuccess: () => {
