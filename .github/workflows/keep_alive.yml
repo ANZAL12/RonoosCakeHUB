@@ -1,0 +1,31 @@
+name: Keep Backend Alive
+
+on:
+  schedule:
+    # Run every 14 minutes
+    - cron: '*/14 * * * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Backend
+        env:
+          RENDER_URL: ${{ secrets.RENDER_BACKEND_URL }}
+        run: |
+          if [ -z "$RENDER_URL" ]; then
+            echo "RENDER_BACKEND_URL secret is not set!"
+            echo "Please set this secret in your repository settings or hardcode your URL here."
+            exit 1
+          fi
+          
+          echo "Pinging $RENDER_URL/api/health/"
+          response=$(curl -s -o /dev/null -w "%{http_code}" "$RENDER_URL/api/health/")
+          
+          if [ "$response" -eq 200 ]; then
+            echo "Success! Backend returned 200 OK."
+          else
+            echo "Failed! Backend returned $response."
+            exit 1
+          fi
