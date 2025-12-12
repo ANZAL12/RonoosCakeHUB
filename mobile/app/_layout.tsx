@@ -2,6 +2,7 @@ import "../global.css";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { useEffect } from "react";
 import { useAuthStore } from "../store/authStore";
+import WhatsAppFloatingButton from "../components/WhatsAppFloatingButton";
 
 
 export default function Layout() {
@@ -29,12 +30,15 @@ export default function Layout() {
     }, [user, isLoading, segments]);
 
     return (
-        <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="login" />
-            <Stack.Screen name="register" />
-            <Stack.Screen name="product/[id]" options={{ presentation: 'modal', headerShown: true, title: 'Product Details' }} />
-            <Stack.Screen name="baker" />
-        </Stack>
+        <>
+            <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="login" />
+                <Stack.Screen name="register" />
+                <Stack.Screen name="product/[id]" options={{ presentation: 'modal', headerShown: true, title: 'Product Details' }} />
+                <Stack.Screen name="baker" />
+            </Stack>
+            <WhatsAppFloatingButton />
+        </>
     );
 }

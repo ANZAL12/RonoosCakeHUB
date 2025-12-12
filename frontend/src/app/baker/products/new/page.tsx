@@ -8,12 +8,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import apiClient from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
+import { Plus, Trash2 } from 'lucide-react';
 
 const productSchema = z.object({
     name: z.string().min(1, 'Name is required'),
     description: z.string().min(1, 'Description is required'),
     category: z.string().min(1, 'Category is required'),
-    price: z.string().min(1, 'Price is required'), // Initial variant price
     image: z.any().optional(),
 });
 
@@ -24,6 +24,7 @@ export default function AddProductPage() {
     const { user } = useAuth();
     const queryClient = useQueryClient();
     const [error, setError] = useState('');
+    const [variants, setVariants] = useState([{ label: '', price: '' }]);
 
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<ProductFormData>({
         resolver: zodResolver(productSchema),
@@ -37,8 +38,32 @@ export default function AddProductPage() {
         },
     });
 
+    const handleAddVariant = () => {
+        setVariants([...variants, { label: '', price: '' }]);
+    };
+
+    const handleRemoveVariant = (index: number) => {
+        if (variants.length > 1) {
+            const newVariants = [...variants];
+            newVariants.splice(index, 1);
+            setVariants(newVariants);
+        }
+    };
+
+    const handleVariantChange = (index: number, field: 'label' | 'price', value: string) => {
+        const newVariants = [...variants];
+        newVariants[index][field] = value;
+        setVariants(newVariants);
+    };
+
     const createProductMutation = useMutation({
         mutationFn: async (data: ProductFormData) => {
+            // Validate variants
+            const validVariants = variants.filter(v => v.label && v.price);
+            if (validVariants.length === 0) {
+                throw new Error('At least one valid variant (Size & Price) is required');
+            }
+
             // 1. Create Product
             const productRes = await apiClient.post('/api/catalog/baker/products/', {
                 name: data.name,
@@ -46,16 +71,20 @@ export default function AddProductPage() {
                 category: data.category,
                 is_active: true,
                 is_customizable: false,
+                // Note: We are NOT sending 'price' here, so no default variant is created
             });
             const productId = productRes.data.id;
 
-            // 2. Create Initial Variant
-            await apiClient.post(`/api/catalog/baker/products/${productId}/variants/`, {
-                label: 'Standard',
-                price: data.price,
-                preparation_hours: 24,
-                is_eggless: false,
-            });
+            // 2. Create Variants
+            const variantPromises = validVariants.map(variant =>
+                apiClient.post(`/api/catalog/baker/products/${productId}/variants/`, {
+                    label: variant.label,
+                    price: variant.price,
+                    preparation_hours: 24, // Default
+                    is_eggless: false,
+                })
+            );
+            await Promise.all(variantPromises);
 
             // 3. Upload Image (if selected)
             if (data.image && data.image.length > 0) {
@@ -77,7 +106,7 @@ export default function AddProductPage() {
             router.push('/baker/products');
         },
         onError: (err: any) => {
-            setError(err.response?.data?.detail || 'Failed to create product');
+            setError(err.response?.data?.detail || err.message || 'Failed to create product');
         },
     });
 
@@ -143,14 +172,51 @@ export default function AddProductPage() {
                             {errors.category && <p className="text-red-600 text-sm mt-1">{errors.category.message}</p>}
                         </div>
 
+                        {/* Variants Section */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Price (₹)</label>
-                            <input
-                                {...register('price')}
-                                type="number"
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
-                            />
-                            {errors.price && <p className="text-red-600 text-sm mt-1">{errors.price.message}</p>}
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Sizes & Rates</label>
+                            <div className="space-y-3">
+                                {variants.map((variant, index) => (
+                                    <div key={index} className="flex gap-4 items-start">
+                                        <div className="flex-1">
+                                            <input
+                                                type="text"
+                                                placeholder="Size (e.g. 1kg)"
+                                                value={variant.label}
+                                                onChange={(e) => handleVariantChange(index, 'label', e.target.value)}
+                                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 text-sm"
+                                                required
+                                            />
+                                        </div>
+                                        <div className="flex-1">
+                                            <input
+                                                type="number"
+                                                placeholder="Price (₹)"
+                                                value={variant.price}
+                                                onChange={(e) => handleVariantChange(index, 'price', e.target.value)}
+                                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 text-sm"
+                                                required
+                                            />
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveVariant(index)}
+                                            disabled={variants.length === 1}
+                                            className="p-2 text-gray-400 hover:text-red-500 disabled:opacity-50"
+                                        >
+                                            <Trash2 size={20} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                            <button
+                                type="button"
+                                onClick={handleAddVariant}
+                                className="mt-3 flex items-center text-sm text-orange-600 hover:text-orange-700 font-medium"
+                            >
+                                <Plus size={16} className="mr-1" />
+                                Add Another Size
+                            </button>
                         </div>
 
                         <div>

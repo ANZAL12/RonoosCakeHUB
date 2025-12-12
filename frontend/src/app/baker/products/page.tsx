@@ -77,6 +77,9 @@ export default function BakerProductsPage() {
                                         </div>
                                         <p className="text-sm text-gray-600 mb-4 line-clamp-2 flex-1">{product.description}</p>
                                         <div className="flex justify-between items-center mb-4 text-sm text-gray-600">
+                                            <span className="text-orange-600 font-bold text-lg">
+                                                ₹{product.price}
+                                            </span>
                                             <span>
                                                 {product.variants?.length || 0} variant(s)
                                             </span>

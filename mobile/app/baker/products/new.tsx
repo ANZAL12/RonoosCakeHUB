@@ -2,12 +2,17 @@ import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert, ActivityIndicator, Image, Modal, FlatList } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { api } from '../../../lib/api';
-import { ArrowLeft, Upload, Image as ImageIcon, X, ChevronDown, Check } from 'lucide-react-native';
+import { ArrowLeft, Upload, Image as ImageIcon, X, ChevronDown, Check, Plus, Trash2 } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 
 type Category = {
     id: number;
     name: string;
+};
+
+type Variant = {
+    label: string;
+    price: string;
 };
 
 export default function NewProductScreen() {
@@ -19,10 +24,10 @@ export default function NewProductScreen() {
     const [formData, setFormData] = useState({
         name: '',
         description: '',
-        price: '',
         category: '',
     });
     const [selectedCategoryName, setSelectedCategoryName] = useState('');
+    const [variants, setVariants] = useState<Variant[]>([{ label: '', price: '' }]);
     const [image, setImage] = useState<string | null>(null);
 
     useFocusEffect(
@@ -30,9 +35,9 @@ export default function NewProductScreen() {
             setFormData({
                 name: '',
                 description: '',
-                price: '',
                 category: '',
             });
+            setVariants([{ label: '', price: '' }]);
             setSelectedCategoryName('');
             setImage(null);
             fetchCategories();
@@ -50,7 +55,6 @@ export default function NewProductScreen() {
     };
 
     const pickImage = async () => {
-        // No permissions request is necessary for launching the image library
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ['images'],
             allowsEditing: false,
@@ -62,35 +66,77 @@ export default function NewProductScreen() {
         }
     };
 
+    const handleAddVariant = () => {
+        setVariants([...variants, { label: '', price: '' }]);
+    };
+
+    const handleRemoveVariant = (index: number) => {
+        if (variants.length > 1) {
+            const newVariants = [...variants];
+            newVariants.splice(index, 1);
+            setVariants(newVariants);
+        }
+    };
+
+    const handleVariantChange = (index: number, field: keyof Variant, value: string) => {
+        const newVariants = [...variants];
+        newVariants[index][field] = value;
+        setVariants(newVariants);
+    };
+
     const handleSubmit = async () => {
-        if (!formData.name || !formData.price || !formData.category) {
-            Alert.alert('Error', 'Name, Price and Category are required');
+        if (!formData.name || !formData.category) {
+            Alert.alert('Error', 'Name and Category are required');
+            return;
+        }
+
+        const validVariants = variants.filter(v => v.label && v.price);
+        if (validVariants.length === 0) {
+            Alert.alert('Error', 'At least one size and price is required');
             return;
         }
 
         setLoading(true);
         try {
-            const data = new FormData();
-            data.append('name', formData.name);
-            data.append('description', formData.description);
-            data.append('price', formData.price);
-            data.append('category', formData.category);
-            data.append('is_active', 'true');
+            // 1. Create Product
+            const productData = new FormData();
+            productData.append('name', formData.name);
+            productData.append('description', formData.description);
+            productData.append('category', formData.category);
+            productData.append('is_active', 'true');
+            // No price sent here
 
+            const productRes = await api.post('/catalog/baker/products/', productData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            const productId = productRes.data.id;
+
+            // 2. Create Variants
+            const variantPromises = validVariants.map(variant =>
+                api.post(`/catalog/baker/products/${productId}/variants/`, {
+                    label: variant.label,
+                    price: variant.price,
+                    preparation_hours: 24,
+                    is_eggless: false,
+                })
+            );
+            await Promise.all(variantPromises);
+
+            // 3. Upload Image (if selected)
             if (image) {
+                const imageData = new FormData();
                 const filename = image.split('/').pop();
                 const match = /\.(\w+)$/.exec(filename ?? '');
                 const type = match ? `image/${match[1]}` : `image`;
 
                 // @ts-ignore
-                data.append('image', { uri: image, name: filename, type });
-            }
+                imageData.append('image', { uri: image, name: filename, type });
+                imageData.append('is_primary', 'true');
 
-            await api.post('/catalog/baker/products/', data, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+                await api.post(`/catalog/baker/products/${productId}/images/`, imageData, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                });
+            }
 
             Alert.alert('Success', 'Product created successfully', [
                 { text: 'OK', onPress: () => router.back() }
@@ -143,14 +189,40 @@ export default function NewProductScreen() {
                         onChangeText={(text) => setFormData({ ...formData, description: text })}
                     />
 
-                    <Text className="text-gray-700 font-semibold mb-2">Price (₹)</Text>
-                    <TextInput
-                        className="border border-gray-200 rounded-lg p-3 mb-4 text-gray-800"
-                        placeholder="0.00"
-                        keyboardType="numeric"
-                        value={formData.price}
-                        onChangeText={(text) => setFormData({ ...formData, price: text })}
-                    />
+                    {/* Variants Section */}
+                    <Text className="text-gray-700 font-semibold mb-2">Sizes & Rates</Text>
+                    {variants.map((variant, index) => (
+                        <View key={index} className="flex-row gap-2 mb-2">
+                            <TextInput
+                                className="flex-1 border border-gray-200 rounded-lg p-3 text-gray-800"
+                                placeholder="Size (e.g. 1kg)"
+                                value={variant.label}
+                                onChangeText={(text) => handleVariantChange(index, 'label', text)}
+                            />
+                            <TextInput
+                                className="flex-1 border border-gray-200 rounded-lg p-3 text-gray-800"
+                                placeholder="Price (₹)"
+                                keyboardType="numeric"
+                                value={variant.price}
+                                onChangeText={(text) => handleVariantChange(index, 'price', text)}
+                            />
+                            <TouchableOpacity
+                                onPress={() => handleRemoveVariant(index)}
+                                disabled={variants.length === 1}
+                                className={`justify-center p-2 rounded-lg ${variants.length === 1 ? 'opacity-30' : ''}`}
+                            >
+                                <Trash2 size={20} color="#EF4444" />
+                            </TouchableOpacity>
+                        </View>
+                    ))}
+
+                    <TouchableOpacity
+                        onPress={handleAddVariant}
+                        className="flex-row items-center mb-6 mt-1"
+                    >
+                        <Plus size={16} color="#ea580c" />
+                        <Text className="text-orange-600 font-semibold ml-1">Add Another Size</Text>
+                    </TouchableOpacity>
 
                     <Text className="text-gray-700 font-semibold mb-2">Product Image</Text>
                     <TouchableOpacity
